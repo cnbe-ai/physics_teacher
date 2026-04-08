@@ -2,6 +2,55 @@ import { useState } from 'react';
 import { Card, CardBody } from '../components/ui/Card';
 import { Accordion } from '../components/ui/Accordion';
 
+// ===== 자기 동기 점검 데이터 =====
+const motivationCheck = [
+  {
+    id: 'autonomy', label: '자율성', icon: '🧭', color: '#0ea5e9',
+    questions: [
+      '나는 지금 전공 공부를 "해야 해서"가 아니라 "하고 싶어서" 한다고 느낀다.',
+      '이번 주 내가 스스로 선택한 학습 목표나 관심 주제가 있었다.',
+      '수업이나 과제에서 나만의 방식으로 접근할 여지가 있다고 느낀다.',
+    ],
+    tips: [
+      '매주 딱 한 가지, 내가 직접 선택한 물리 주제를 15분만 탐색해보세요.',
+      '과제 방식을 바꿀 수 없어도, 왜 이걸 배우는지 나만의 이유를 적어보세요.',
+      '"나는 왜 이 전공을 선택했는가?"를 다시 써보는 것만으로도 자율감이 회복됩니다.',
+    ],
+  },
+  {
+    id: 'competence', label: '유능감', icon: '🏆', color: '#f59e0b',
+    questions: [
+      '이번 주 공부하면서 "아, 이해됐다!"는 순간이 한 번이라도 있었다.',
+      '지난달보다 내가 성장했다는 느낌을 받는다.',
+      '어려운 문제를 포기하지 않고 끝까지 해결하려 노력했다.',
+    ],
+    tips: [
+      '오늘 내가 이해한 개념 딱 하나만 노트에 적어두세요. 누적되면 포트폴리오가 됩니다.',
+      '지금 어렵다면, 작년 시험 문제 한 문제만 다시 풀어보세요. 성장이 보입니다.',
+      '친구에게 오늘 배운 내용을 1분 설명해보면 유능감이 즉시 올라갑니다.',
+    ],
+  },
+  {
+    id: 'relatedness', label: '관계성', icon: '🤝', color: '#10b981',
+    questions: [
+      '학과에 내 고민을 털어놓을 수 있는 사람이 한 명 이상 있다.',
+      '이번 주 같은 전공 학생과 공부나 진로에 대한 대화를 나눴다.',
+      '이 공동체(학과, 수업)의 일원이라는 소속감을 느낀다.',
+    ],
+    tips: [
+      '카톡이나 문자로 "이번 주 공부 어때?" 한 마디만 먼저 건네보세요.',
+      '혼자 도서관보다 카페에서 같은 과 친구와 나란히 공부해보세요.',
+      '교수님 오피스아워를 한 번만 방문해보세요. 소속감이 달라집니다.',
+    ],
+  },
+];
+
+const RATINGS = [
+  { value: 3, label: '그렇다',    emoji: '😊', color: '#10b981' },
+  { value: 2, label: '보통이다',  emoji: '😐', color: '#f59e0b' },
+  { value: 1, label: '아니다',    emoji: '😟', color: '#ef4444' },
+];
+
 const sdtCards = [
   {
     id: 'autonomy', label: '자율성 (Autonomy)', icon: '🧭', color: '#0ea5e9',
@@ -89,23 +138,243 @@ const slumps = [
   },
 ];
 
-const courseRoadmap = [
-  { session: '1',  theme: '나는 왜 물리교육과인가',         activity: '자기 소개 + 진로 기대 나누기' },
-  { session: '2',  theme: '대학 물리, 고교 물리와 뭐가 다른가', activity: '학습법 전환 워크숍' },
-  { session: '3',  theme: 'Tinto 모형으로 보는 대학 적응',   activity: '위기 타임라인 자기 분석' },
-  { session: '4',  theme: 'PCK란 무엇인가',                  activity: 'Shulman 논문 핵심 읽기 + 토론' },
-  { session: '5',  theme: '임용 이외의 진로 탐색',           activity: '진로 경로 맵 작성' },
-  { session: '6',  theme: 'SDT와 내재 동기',                 activity: '나의 동기 유형 진단' },
-  { session: '7',  theme: '슬럼프 처방전',                   activity: '개인 슬럼프 분석 및 처방 작성' },
-  { session: '8',  theme: '중간 자기진단',                   activity: '5개 영역 자기진단 실시 + 분석' },
-  { session: '9',  theme: '물리교사의 전문성',               activity: '물리 수업 관찰 + PCK 분석' },
-  { session: '10', theme: '교육 연구 맛보기',                activity: '물리교육 논문 1편 읽기 + 발표' },
-  { session: '11', theme: '졸업생 특강',                     activity: '다양한 진로의 선배 패널 토크' },
-  { session: '12', theme: '커뮤니티 만들기',                 activity: '스터디 그룹 구성 + 학습 계약' },
-  { session: '13', theme: '나의 교육 철학 초안',             activity: '교육 철학 서술 워크숍' },
-  { session: '14', theme: '진로 로드맵 발표',                activity: '개인 진로 계획 발표 및 피드백' },
-  { session: '15', theme: '성찰과 다짐',                     activity: '포트폴리오 제출 + 2학기 목표 선언' },
-];
+
+function MotivationCheckSection() {
+  const totalQ = motivationCheck.reduce((acc, d) => acc + d.questions.length, 0);
+  const [answers, setAnswers] = useState({});
+  const [done, setDone] = useState(false);
+
+  const answered = Object.keys(answers).length;
+  const isComplete = answered === totalQ;
+
+  const getScore = (dimId) => {
+    const dim = motivationCheck.find(d => d.id === dimId);
+    return dim.questions.reduce((sum, _, qi) => sum + (answers[`${dimId}-${qi}`] || 0), 0);
+  };
+  const maxPerDim = 9;
+
+  const getLevel = (score) => {
+    if (score >= 8) return { label: '양호', color: '#10b981', bg: '#ecfdf5' };
+    if (score >= 5) return { label: '보통', color: '#f59e0b', bg: '#fffbeb' };
+    return { label: '주의', color: '#ef4444', bg: '#fef2f2' };
+  };
+
+  const handleReset = () => { setAnswers({}); setDone(false); };
+
+  return (
+    <section>
+      <h2 style={{ marginBottom: '0.5rem' }}>🔍 이번 주 나의 동기 점검</h2>
+      <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+        SDT 세 가지 욕구가 지금 얼마나 충족되고 있는지 솔직하게 체크해보세요.
+        점검 결과에 따라 맞춤 행동 제안을 드립니다.
+      </p>
+
+      {!done ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* 진행률 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ flex: 1, height: '8px', backgroundColor: '#e2e8f0', borderRadius: '999px', overflow: 'hidden' }}>
+              <div style={{
+                height: '100%', borderRadius: '999px', backgroundColor: '#1a3a6b',
+                width: `${(answered / totalQ) * 100}%`, transition: 'width 0.4s ease',
+              }} />
+            </div>
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#475569', whiteSpace: 'nowrap' }}>
+              {answered} / {totalQ}
+            </span>
+          </div>
+
+          {/* 문항 카드 */}
+          {motivationCheck.map((dim) => (
+            <Card key={dim.id} topColor={dim.color}>
+              <CardBody>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                  <div style={{
+                    width: '2.75rem', height: '2.75rem', borderRadius: '0.75rem', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '1.375rem', backgroundColor: `${dim.color}15`,
+                  }}>
+                    {dim.icon}
+                  </div>
+                  <h3 style={{ fontSize: '1.0625rem', color: '#0f172a', margin: 0 }}>{dim.label}</h3>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  {dim.questions.map((q, qi) => {
+                    const key = `${dim.id}-${qi}`;
+                    return (
+                      <div key={key}>
+                        <p style={{ fontSize: '0.9375rem', color: '#1e293b', lineHeight: 1.7, marginBottom: '0.75rem', fontWeight: 500 }}>
+                          {q}
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
+                          {RATINGS.map((r) => {
+                            const selected = answers[key] === r.value;
+                            return (
+                              <button
+                                key={r.value}
+                                onClick={() => setAnswers(prev => ({ ...prev, [key]: r.value }))}
+                                style={{
+                                  display: 'flex', alignItems: 'center', gap: '0.375rem',
+                                  padding: '0.5rem 1rem',
+                                  borderRadius: '2rem',
+                                  fontSize: '0.9rem', fontWeight: 600,
+                                  border: `2px solid ${selected ? r.color : '#e2e8f0'}`,
+                                  backgroundColor: selected ? r.color : '#ffffff',
+                                  color: selected ? '#ffffff' : '#64748b',
+                                  cursor: 'pointer',
+                                  boxShadow: selected ? `0 3px 10px ${r.color}40` : 'none',
+                                  transition: 'all 0.15s ease',
+                                }}
+                              >
+                                <span style={{ fontSize: '1.05rem' }}>{r.emoji}</span>
+                                {r.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+
+          <button
+            onClick={() => isComplete && setDone(true)}
+            disabled={!isComplete}
+            style={{
+              padding: '1rem 1.5rem', borderRadius: '0.75rem',
+              fontWeight: 700, fontSize: '1.0625rem', color: '#ffffff',
+              backgroundColor: isComplete ? '#1a3a6b' : '#94a3b8',
+              border: 'none',
+              boxShadow: isComplete ? '0 4px 14px rgba(26,58,107,0.35)' : 'none',
+              cursor: isComplete ? 'pointer' : 'not-allowed',
+              transition: 'all 0.2s',
+            }}
+          >
+            {isComplete ? '📊 점검 결과 보기' : `아직 ${totalQ - answered}개 항목이 남았습니다`}
+          </button>
+        </div>
+      ) : (
+        <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
+          {/* 요약 배너 */}
+          <div style={{
+            borderRadius: '1rem', padding: '1.5rem 2rem',
+            background: 'linear-gradient(135deg, #1a3a6b, #0ea5e9)',
+            color: '#ffffff',
+          }}>
+            <h3 style={{ color: '#ffffff', fontFamily: 'var(--font-serif)', marginBottom: '0.75rem', fontSize: '1.125rem' }}>
+              이번 주 나의 동기 상태
+            </h3>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              {motivationCheck.map((dim) => {
+                const score = getScore(dim.id);
+                const lv = getLevel(score);
+                return (
+                  <div key={dim.id} style={{
+                    backgroundColor: 'rgba(255,255,255,0.15)',
+                    borderRadius: '0.75rem', padding: '0.625rem 1rem',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  }}>
+                    <span style={{ fontSize: '1.25rem' }}>{dim.icon}</span>
+                    <div>
+                      <p style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{dim.label}</p>
+                      <p style={{ fontWeight: 800, fontSize: '1rem', color: '#ffffff', margin: 0 }}>
+                        {score}/{maxPerDim}
+                        <span style={{
+                          marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 700,
+                          padding: '0.1rem 0.5rem', borderRadius: '2rem',
+                          backgroundColor: lv.color, color: '#ffffff',
+                        }}>
+                          {lv.label}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 영역별 피드백 */}
+          {motivationCheck.map((dim) => {
+            const score = getScore(dim.id);
+            const lv = getLevel(score);
+            const pct = Math.round((score / maxPerDim) * 100);
+            const needsAttention = score < 5;
+            return (
+              <Card key={dim.id} topColor={dim.color}>
+                <CardBody>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{dim.icon}</span>
+                    <h3 style={{ flex: 1, margin: 0, fontSize: '1.0625rem' }}>{dim.label}</h3>
+                    <span style={{
+                      fontSize: '0.8125rem', fontWeight: 700,
+                      padding: '0.25rem 0.75rem', borderRadius: '2rem',
+                      backgroundColor: lv.bg, color: lv.color,
+                      border: `1px solid ${lv.color}40`,
+                    }}>
+                      {lv.label}
+                    </span>
+                  </div>
+
+                  {/* 점수 바 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <div style={{ flex: 1, height: '8px', backgroundColor: '#f1f5f9', borderRadius: '999px', overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: '999px',
+                        width: `${pct}%`, backgroundColor: lv.color,
+                        transition: 'width 0.7s ease',
+                      }} />
+                    </div>
+                    <span style={{ fontWeight: 800, fontSize: '1rem', color: lv.color, minWidth: '3.5rem', textAlign: 'right' }}>
+                      {score}/{maxPerDim}
+                    </span>
+                  </div>
+
+                  {/* 행동 제안 (주의 영역만 강조) */}
+                  <div style={{
+                    borderRadius: '0.625rem', padding: '0.875rem 1rem',
+                    backgroundColor: needsAttention ? `${dim.color}10` : '#f8fafc',
+                    border: `1px solid ${needsAttention ? dim.color + '30' : '#e2e8f0'}`,
+                  }}>
+                    <p style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#94a3b8',
+                      textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.625rem' }}>
+                      {needsAttention ? '🎯 지금 바로 해볼 행동' : '✅ 잘 되고 있어요! 유지 팁'}
+                    </p>
+                    <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {dim.tips.map((tip, i) => (
+                        <li key={i} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.9375rem', color: '#334155', lineHeight: 1.7 }}>
+                          <span style={{ color: dim.color, flexShrink: 0, fontWeight: 700 }}>•</span>
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </CardBody>
+              </Card>
+            );
+          })}
+
+          <button
+            onClick={handleReset}
+            style={{
+              padding: '0.875rem 1.5rem', borderRadius: '0.75rem',
+              fontWeight: 600, fontSize: '0.9375rem',
+              color: '#475569', backgroundColor: '#ffffff',
+              border: '2px solid #e2e8f0', cursor: 'pointer',
+              alignSelf: 'flex-start',
+            }}
+          >
+            🔄 다시 점검하기
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function MotivationPage() {
   const [activeSemester, setActiveSemester] = useState(0);
@@ -247,44 +516,8 @@ export default function MotivationPage() {
         </div>
       </section>
 
-      {/* 15-week roadmap */}
-      <section>
-        <h2 style={{ marginBottom: '0.5rem' }}>📆 수업 15주 로드맵</h2>
-        <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.25rem' }}>
-          전공 탐색 및 진로 설계 수업 전체 구성입니다.
-        </p>
-        <Card>
-          <div style={{ overflowX: 'auto' }}>
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'center', width: '4.5rem' }}>회차</th>
-                  <th>주제</th>
-                  <th>핵심 활동</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courseRoadmap.map((row) => (
-                  <tr key={row.session}>
-                    <td style={{ textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: '2rem', height: '2rem', borderRadius: '50%',
-                        fontSize: '0.8125rem', fontWeight: 800, color: '#ffffff',
-                        backgroundColor: '#1a3a6b',
-                      }}>
-                        {row.session}
-                      </span>
-                    </td>
-                    <td style={{ fontWeight: 700, color: '#1e293b' }}>{row.theme}</td>
-                    <td style={{ color: '#475569' }}>{row.activity}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </section>
+      {/* 자기 동기 점검 */}
+      <MotivationCheckSection />
     </div>
   );
 }
