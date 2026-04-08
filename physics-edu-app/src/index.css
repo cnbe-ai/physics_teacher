@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+:root {
+  --primary: #1a3a6b;
+  --secondary: #0ea5e9;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Noto Serif KR', serif;
+}
+
+/* Tab fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Accordion slide */
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 2000px; }
+}
+
+.accordion-content {
+  overflow: hidden;
+  animation: slideDown 0.35s ease-out;
+}
+
+/* Chat panel slide */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.chat-panel-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Typing indicator */
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.typing-dot {
+  animation: typingDot 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Card hover */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(26,58,107,0.15);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
