@@ -1,89 +1,111 @@
 import { useState } from 'react';
-import { ExternalLink } from 'lucide-react';
 import { Card, CardBody } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
 import { careerPaths, licensureInfo } from '../data/careerData';
 
 function CareerCard({ path }) {
   const [hovered, setHovered] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div
-      className="relative rounded-xl overflow-hidden border border-slate-200 cursor-pointer transition-all duration-300"
-      style={{
-        borderTopWidth: '3px',
-        borderTopColor: path.color,
-        transform: hovered ? 'translateY(-4px)' : 'none',
-        boxShadow: hovered ? `0 12px 30px -5px ${path.color}30` : '0 1px 3px rgba(0,0,0,0.05)',
-      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      style={{
+        borderRadius: '1rem',
+        backgroundColor: '#ffffff',
+        border: `1.5px solid ${hovered ? path.color + '50' : '#e2e8f0'}`,
+        borderTop: `4px solid ${path.color}`,
+        padding: '1.5rem',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        transform: hovered ? 'translateY(-4px)' : 'none',
+        boxShadow: hovered ? `0 12px 28px ${path.color}20` : '0 1px 4px rgba(0,0,0,0.05)',
+      }}
+      onClick={() => setExpanded(!expanded)}
     >
-      <div className="bg-white p-5">
-        <div className="flex items-start justify-between mb-3">
-          <div className="text-3xl">{path.icon}</div>
-          <Badge color={path.badgeColor}>{path.badge}</Badge>
-        </div>
-        <h3 className="font-bold text-slate-800 mb-1">{path.title}</h3>
-        <p className="text-sm text-slate-500 mb-3">{path.subtitle}</p>
-        <p className="text-sm text-slate-600 leading-relaxed">{path.description}</p>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.875rem' }}>
+        <span style={{ fontSize: '2.25rem' }}>{path.icon}</span>
+        <span style={{
+          fontSize: '0.75rem', fontWeight: 700,
+          padding: '0.25rem 0.625rem', borderRadius: '2rem',
+          backgroundColor: `${path.badgeColor}18`, color: path.badgeColor,
+          border: `1px solid ${path.badgeColor}40`,
+        }}>
+          {path.badge}
+        </span>
+      </div>
 
-        {/* Details on hover */}
-        <div
-          className="mt-4 space-y-1.5 overflow-hidden transition-all duration-300"
-          style={{ maxHeight: hovered ? '200px' : '0', opacity: hovered ? 1 : 0 }}
-        >
+      {/* Title */}
+      <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.0625rem', color: '#0f172a', marginBottom: '0.375rem' }}>
+        {path.title}
+      </h3>
+      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.875rem', lineHeight: 1.5 }}>
+        {path.subtitle}
+      </p>
+      <p style={{ fontSize: '0.9375rem', color: '#475569', lineHeight: 1.75 }}>
+        {path.description}
+      </p>
+
+      {/* Expandable details */}
+      {(hovered || expanded) && (
+        <div style={{
+          marginTop: '1.125rem',
+          paddingTop: '1rem',
+          borderTop: `1px solid ${path.color}25`,
+          display: 'flex', flexDirection: 'column', gap: '0.5rem',
+        }}>
           {path.details.map((detail, i) => (
-            <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
-              <span style={{ color: path.color }} className="mt-0.5">•</span>
+            <div key={i} style={{ display: 'flex', gap: '0.625rem', fontSize: '0.875rem', color: '#475569', lineHeight: 1.65 }}>
+              <span style={{ color: path.color, flexShrink: 0, fontWeight: 700 }}>•</span>
               {detail}
             </div>
           ))}
-          <div
-            className="mt-3 text-xs font-semibold px-3 py-1.5 rounded-lg inline-block"
-            style={{ backgroundColor: `${path.color}15`, color: path.color }}
-          >
+          <div style={{
+            marginTop: '0.5rem',
+            display: 'inline-block', fontSize: '0.8125rem', fontWeight: 700,
+            padding: '0.375rem 0.875rem', borderRadius: '0.5rem',
+            backgroundColor: `${path.color}15`, color: path.color,
+            border: `1px solid ${path.color}30`,
+          }}>
             💡 {path.action}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
 export default function CareerPage() {
   return (
-    <div className="page-enter space-y-10">
-      {/* Header */}
-      <section>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Noto Serif KR, serif' }}>
-          🎯 졸업 후 6가지 경로
-        </h2>
-        <p className="text-slate-500 mb-6">임용고시 합격만이 유일한 길이 아닙니다. 각 카드에 마우스를 올려 상세 정보를 확인하세요.</p>
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <section>
+        <h2 style={{ marginBottom: '0.5rem' }}>🎯 졸업 후 6가지 경로</h2>
+        <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+          임용고시 합격만이 유일한 길이 아닙니다. 각 카드를 클릭하거나 마우스를 올려 상세 정보를 확인하세요.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.125rem' }}>
           {careerPaths.map((path) => (
             <CareerCard key={path.id} path={path} />
           ))}
         </div>
       </section>
 
-      {/* Licensure Balance */}
       <section>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Noto Serif KR, serif' }}>
-          ⚖️ 임용고시, 균형 잡힌 시각으로 보기
-        </h2>
-        <p className="text-slate-500 mb-6">임용고시를 포기하란 말이 아닙니다. 다만 현실을 냉정하게 직시하고 전략적으로 준비하세요.</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h2 style={{ marginBottom: '0.5rem' }}>⚖️ 임용고시, 균형 잡힌 시각으로 보기</h2>
+        <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+          임용고시를 포기하란 말이 아닙니다. 현실을 냉정하게 직시하고 전략적으로 준비하세요.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
           {licensureInfo.map((item, idx) => (
             <Card key={idx} topColor="#1a3a6b">
               <CardBody>
-                <div className="flex items-start gap-4">
-                  <span className="text-2xl">{item.icon}</span>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '1.75rem', flexShrink: 0 }}>{item.icon}</span>
                   <div>
-                    <h4 className="font-bold text-slate-800 mb-2">{item.category}</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">{item.content}</p>
+                    <h4 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>{item.category}</h4>
+                    <p style={{ fontSize: '0.9375rem', color: '#475569', lineHeight: 1.75 }}>{item.content}</p>
                   </div>
                 </div>
               </CardBody>
@@ -92,15 +114,22 @@ export default function CareerPage() {
         </div>
       </section>
 
-      {/* Inspiration Quote */}
-      <div className="rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 p-6">
-        <div className="flex items-start gap-4">
-          <span className="text-3xl">🌟</span>
+      <div style={{
+        borderRadius: '1rem', padding: '1.75rem 2rem',
+        background: 'linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%)',
+        border: '1.5px solid #fed7aa',
+      }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+          <span style={{ fontSize: '2rem', flexShrink: 0 }}>🌟</span>
           <div>
-            <h3 className="font-bold text-amber-800 mb-2">물리교육과 졸업생의 강점</h3>
-            <p className="text-amber-700 leading-relaxed text-sm">
-              물리교육과를 졸업한 사람은 <strong>복잡한 개념을 단순하게 설명하는 능력</strong>,
-              <strong> 논리적 사고력</strong>, <strong>교육적 감수성</strong>을 동시에 갖춘 희귀한 인재입니다.
+            <h3 style={{ color: '#92400e', marginBottom: '0.625rem', fontSize: '1.0625rem', fontFamily: 'var(--font-serif)' }}>
+              물리교육과 졸업생의 강점
+            </h3>
+            <p style={{ color: '#78350f', fontSize: '0.9375rem', lineHeight: 1.8 }}>
+              물리교육과를 졸업한 사람은{' '}
+              <strong>복잡한 개념을 단순하게 설명하는 능력</strong>,{' '}
+              <strong>논리적 사고력</strong>,{' '}
+              <strong>교육적 감수성</strong>을 동시에 갖춘 희귀한 인재입니다.
               이는 교육 현장 밖에서도 매우 가치 있는 역량입니다.
             </p>
           </div>

@@ -6,6 +6,12 @@ import {
 import { Card, CardBody } from '../components/ui/Card';
 import { diagnosisAreas, scoreInterpretations } from '../data/diagnosisData';
 
+const S = {
+  section: { display: 'flex', flexDirection: 'column', gap: '2rem' },
+  sectionTitle: { marginBottom: '0.375rem' },
+  sectionDesc: { color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.5rem' },
+};
+
 export default function DiagnosisPage({ onOpenChat }) {
   const [scores, setScores] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -23,107 +29,138 @@ export default function DiagnosisPage({ onOpenChat }) {
   const maxScore = totalQuestions * 5;
 
   const radarData = diagnosisAreas.map((area) => ({
-    subject: area.label.replace('에 대한 ', '\n').replace('에 대한', '\n'),
-    fullSubject: area.label,
+    subject: area.label,
     score: getAreaScore(area.id),
     fullMark: 15,
-    icon: area.icon,
+    fullSubject: area.label,
   }));
 
-  const interpretation = scoreInterpretations.find(
-    (s) => totalScore >= s.min && totalScore <= s.max
-  );
+  const interpretation = scoreInterpretations.find(s => totalScore >= s.min && totalScore <= s.max);
 
   const handleSetScore = (questionId, value) => {
-    setScores((prev) => ({ ...prev, [questionId]: value }));
+    setScores(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const handleSubmit = () => {
-    if (isComplete) setSubmitted(true);
-  };
-
-  const handleReset = () => {
-    setScores({});
-    setSubmitted(false);
-  };
+  const handleSubmit = () => { if (isComplete) setSubmitted(true); };
+  const handleReset = () => { setScores({}); setSubmitted(false); };
 
   const handleAIAdvice = () => {
-    const resultText = diagnosisAreas.map((area) => {
+    const resultText = diagnosisAreas.map(area => {
       const score = getAreaScore(area.id);
       return `${area.label}: ${score}/15점`;
     }).join(', ');
-
     if (onOpenChat) {
-      onOpenChat(
-        `자기진단 결과를 바탕으로 맞춤 조언해주세요.\n\n[진단 결과]\n총점: ${totalScore}/${maxScore}점 (${interpretation?.label})\n${resultText}\n\n특히 낮은 영역에 대해 구체적인 개선 방법을 알려주세요.`
-      );
+      onOpenChat(`자기진단 결과를 바탕으로 맞춤 조언해주세요.\n\n[진단 결과]\n총점: ${totalScore}/${maxScore}점 (${interpretation?.label})\n${resultText}\n\n특히 낮은 영역에 대해 구체적인 개선 방법을 알려주세요.`);
     }
   };
 
   return (
-    <div className="page-enter space-y-8">
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
       {/* Header */}
       <section>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Noto Serif KR, serif' }}>
-          📋 물리교육과 적응 자기진단
-        </h2>
-        <p className="text-slate-500 mb-4">
+        <h2 style={S.sectionTitle}>📋 물리교육과 적응 자기진단</h2>
+        <p style={S.sectionDesc}>
           5개 영역, 총 15문항입니다. 각 문항을 1(전혀 그렇지 않다) ~ 5(매우 그렇다)로 평가해주세요.
         </p>
 
-        {/* Progress bar */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${(answeredCount / totalQuestions) * 100}%`, backgroundColor: '#0ea5e9' }}
-            />
+        {/* Progress */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{
+            flex: 1, height: '10px', backgroundColor: '#e2e8f0',
+            borderRadius: '999px', overflow: 'hidden',
+          }}>
+            <div style={{
+              height: '100%', borderRadius: '999px',
+              width: `${(answeredCount / totalQuestions) * 100}%`,
+              backgroundColor: '#0ea5e9',
+              transition: 'width 0.5s ease',
+            }} />
           </div>
-          <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
-            {answeredCount}/{totalQuestions} 완료
+          <span style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#475569', whiteSpace: 'nowrap' }}>
+            {answeredCount} / {totalQuestions} 완료
           </span>
         </div>
       </section>
 
       {/* Questionnaire */}
       {!submitted && (
-        <div className="space-y-6">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {diagnosisAreas.map((area) => (
             <Card key={area.id} topColor={area.color}>
               <CardBody>
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-2xl">{area.icon}</span>
+                {/* Area header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.5rem' }}>
+                  <div style={{
+                    width: '3rem', height: '3rem', borderRadius: '0.75rem', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '1.5rem',
+                    backgroundColor: `${area.color}15`,
+                    border: `2px solid ${area.color}30`,
+                  }}>
+                    {area.icon}
+                  </div>
                   <div>
-                    <h3 className="font-bold text-slate-800">영역 {area.id}: {area.label}</h3>
-                    <p className="text-xs text-slate-400">3문항 · 최대 15점</p>
+                    <h3 style={{ margin: 0, fontSize: '1.0625rem', color: '#0f172a' }}>
+                      영역 {area.id}: {area.label}
+                    </h3>
+                    <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8', marginTop: '0.125rem' }}>
+                      3문항 · 최대 15점
+                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-5">
-                  {area.questions.map((q, qIdx) => (
+                {/* Questions */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  {area.questions.map((q) => (
                     <div key={q.id}>
-                      <p className="text-sm font-medium text-slate-700 mb-3">
-                        <span className="text-xs text-slate-400 mr-2">{q.id}</span>
+                      <p style={{
+                        fontWeight: 600, fontSize: '1rem', color: '#1e293b',
+                        lineHeight: 1.65, marginBottom: '1rem',
+                      }}>
+                        <span style={{
+                          display: 'inline-block', marginRight: '0.5rem',
+                          fontSize: '0.75rem', fontWeight: 700, color: area.color,
+                          backgroundColor: `${area.color}15`,
+                          padding: '0.125rem 0.4rem', borderRadius: '0.25rem',
+                        }}>
+                          {q.id}
+                        </span>
                         {q.text}
                       </p>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-slate-400 mr-2 w-20 text-right">전혀 아님</span>
-                        {[1, 2, 3, 4, 5].map((val) => (
-                          <button
-                            key={val}
-                            onClick={() => handleSetScore(q.id, val)}
-                            className="w-9 h-9 rounded-lg text-sm font-bold transition-all duration-150 border-2"
-                            style={{
-                              backgroundColor: scores[q.id] === val ? area.color : 'transparent',
-                              borderColor: scores[q.id] === val ? area.color : '#e2e8f0',
-                              color: scores[q.id] === val ? '#ffffff' : '#94a3b8',
-                              transform: scores[q.id] === val ? 'scale(1.1)' : 'scale(1)',
-                            }}
-                          >
-                            {val}
-                          </button>
-                        ))}
-                        <span className="text-xs text-slate-400 ml-2">매우 그렇다</span>
+
+                      {/* Rating buttons */}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                        flexWrap: 'wrap',
+                      }}>
+                        <span style={{ fontSize: '0.8125rem', color: '#94a3b8', minWidth: '4rem', textAlign: 'right' }}>
+                          전혀 아님
+                        </span>
+                        {[1, 2, 3, 4, 5].map((val) => {
+                          const selected = scores[q.id] === val;
+                          return (
+                            <button
+                              key={val}
+                              onClick={() => handleSetScore(q.id, val)}
+                              style={{
+                                width: '2.75rem', height: '2.75rem',
+                                borderRadius: '0.5rem',
+                                fontSize: '1rem', fontWeight: 700,
+                                border: `2px solid ${selected ? area.color : '#cbd5e1'}`,
+                                backgroundColor: selected ? area.color : '#ffffff',
+                                color: selected ? '#ffffff' : '#64748b',
+                                transform: selected ? 'scale(1.12)' : 'scale(1)',
+                                boxShadow: selected ? `0 4px 12px ${area.color}40` : 'none',
+                                transition: 'all 0.15s ease',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {val}
+                            </button>
+                          );
+                        })}
+                        <span style={{ fontSize: '0.8125rem', color: '#94a3b8' }}>매우 그렇다</span>
                       </div>
                     </div>
                   ))}
@@ -132,18 +169,36 @@ export default function DiagnosisPage({ onOpenChat }) {
             </Card>
           ))}
 
-          <div className="flex gap-3">
+          {/* Submit buttons */}
+          <div style={{ display: 'flex', gap: '0.875rem' }}>
             <button
               onClick={handleSubmit}
               disabled={!isComplete}
-              className="flex-1 py-3.5 rounded-xl font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ backgroundColor: isComplete ? '#1a3a6b' : '#94a3b8' }}
+              style={{
+                flex: 1, padding: '1rem 1.5rem',
+                borderRadius: '0.75rem',
+                fontWeight: 700, fontSize: '1.0625rem', color: '#ffffff',
+                backgroundColor: isComplete ? '#1a3a6b' : '#94a3b8',
+                border: 'none',
+                boxShadow: isComplete ? '0 4px 14px rgba(26,58,107,0.35)' : 'none',
+                cursor: isComplete ? 'pointer' : 'not-allowed',
+                transition: 'all 0.2s',
+              }}
             >
-              {isComplete ? '📊 결과 확인하기' : `${totalQuestions - answeredCount}개 문항이 남았습니다`}
+              {isComplete ? '📊 결과 확인하기' : `아직 ${totalQuestions - answeredCount}개 문항이 남았습니다`}
             </button>
             <button
               onClick={handleReset}
-              className="px-5 py-3.5 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors"
+              style={{
+                padding: '1rem 1.5rem',
+                borderRadius: '0.75rem',
+                fontWeight: 600, fontSize: '0.9375rem',
+                color: '#475569',
+                backgroundColor: '#ffffff',
+                border: '2px solid #e2e8f0',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
             >
               초기화
             </button>
@@ -153,20 +208,31 @@ export default function DiagnosisPage({ onOpenChat }) {
 
       {/* Results */}
       {submitted && (
-        <div className="space-y-6 page-enter">
-          {/* Score summary */}
-          <div
-            className="rounded-2xl p-6 text-white"
-            style={{ background: `linear-gradient(135deg, ${interpretation?.color || '#1a3a6b'}, ${interpretation?.color || '#1a3a6b'}aa)` }}
-          >
-            <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+          {/* Score banner */}
+          <div style={{
+            borderRadius: '1.125rem', padding: '2rem',
+            background: `linear-gradient(135deg, ${interpretation?.color || '#1a3a6b'}, ${interpretation?.color || '#1a3a6b'}bb)`,
+            color: '#ffffff',
+            boxShadow: `0 8px 24px ${interpretation?.color || '#1a3a6b'}40`,
+          }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p className="text-white/70 text-sm mb-1">총점</p>
-                <div className="text-4xl font-bold">{totalScore} <span className="text-2xl font-normal">/ {maxScore}</span></div>
-                <div className="text-lg font-semibold mt-1">{interpretation?.label}</div>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>총점</p>
+                <div style={{ fontSize: '3rem', fontWeight: 800, lineHeight: 1 }}>
+                  {totalScore}
+                  <span style={{ fontSize: '1.5rem', fontWeight: 400, marginLeft: '0.25rem' }}>/ {maxScore}</span>
+                </div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '0.5rem' }}>{interpretation?.label}</div>
               </div>
-              <div className="bg-white/20 rounded-xl p-4 max-w-xs">
-                <p className="text-sm text-white/90 leading-relaxed">{interpretation?.message}</p>
+              <div style={{
+                backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '0.875rem',
+                padding: '1.125rem 1.25rem', maxWidth: '320px',
+              }}>
+                <p style={{ fontSize: '0.9375rem', lineHeight: 1.75, color: 'rgba(255,255,255,0.92)' }}>
+                  {interpretation?.message}
+                </p>
               </div>
             </div>
           </div>
@@ -174,37 +240,26 @@ export default function DiagnosisPage({ onOpenChat }) {
           {/* Radar Chart */}
           <Card>
             <CardBody>
-              <h3 className="font-bold text-slate-800 mb-4 text-center">영역별 점수 프로파일</h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <h3 style={{ textAlign: 'center', marginBottom: '1.25rem', fontSize: '1.0625rem' }}>
+                영역별 점수 프로파일
+              </h3>
+              <ResponsiveContainer width="100%" height={320}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="#e2e8f0" />
                   <PolarAngleAxis
                     dataKey="subject"
-                    tick={{ fontSize: 11, fill: '#64748b', fontFamily: 'Noto Sans KR, sans-serif' }}
+                    tick={{ fontSize: 12, fill: '#475569', fontFamily: 'Noto Sans KR, sans-serif' }}
                   />
-                  <PolarRadiusAxis
-                    angle={90}
-                    domain={[0, 15]}
-                    tick={{ fontSize: 10, fill: '#94a3b8' }}
-                    tickCount={4}
-                  />
-                  <Radar
-                    dataKey="score"
-                    stroke="#1a3a6b"
-                    fill="#1a3a6b"
-                    fillOpacity={0.3}
-                    strokeWidth={2}
-                  />
-                  <Tooltip
-                    formatter={(value, name, props) => [`${value}/15점`, props.payload.fullSubject]}
-                  />
+                  <PolarRadiusAxis angle={90} domain={[0, 15]} tick={{ fontSize: 11, fill: '#94a3b8' }} tickCount={4} />
+                  <Radar dataKey="score" stroke="#1a3a6b" fill="#1a3a6b" fillOpacity={0.25} strokeWidth={2.5} />
+                  <Tooltip formatter={(value, name, props) => [`${value}/15점`, props.payload.fullSubject]} />
                 </RadarChart>
               </ResponsiveContainer>
             </CardBody>
           </Card>
 
           {/* Area breakdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             {diagnosisAreas.map((area) => {
               const score = getAreaScore(area.id);
               const pct = (score / 15) * 100;
@@ -212,21 +267,33 @@ export default function DiagnosisPage({ onOpenChat }) {
               return (
                 <Card key={area.id} topColor={area.color}>
                   <CardBody>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xl">{area.icon}</span>
-                      <span className="font-semibold text-slate-700 text-sm">{area.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.875rem' }}>
+                      <span style={{ fontSize: '1.375rem' }}>{area.icon}</span>
+                      <span style={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1e293b', flex: 1 }}>{area.label}</span>
                       {isLow && (
-                        <span className="ml-auto text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-medium">집중 필요</span>
+                        <span style={{
+                          fontSize: '0.75rem', fontWeight: 700,
+                          backgroundColor: '#fef2f2', color: '#ef4444',
+                          padding: '0.2rem 0.5rem', borderRadius: '2rem',
+                        }}>
+                          집중 필요
+                        </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700"
-                          style={{ width: `${pct}%`, backgroundColor: area.color }}
-                        />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{
+                        flex: 1, height: '8px', backgroundColor: '#f1f5f9',
+                        borderRadius: '999px', overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          height: '100%', borderRadius: '999px',
+                          width: `${pct}%`, backgroundColor: area.color,
+                          transition: 'width 0.7s ease',
+                        }} />
                       </div>
-                      <span className="text-sm font-bold" style={{ color: area.color }}>{score}/15</span>
+                      <span style={{ fontWeight: 800, fontSize: '1rem', color: area.color, minWidth: '3rem', textAlign: 'right' }}>
+                        {score}/15
+                      </span>
                     </div>
                   </CardBody>
                 </Card>
@@ -234,18 +301,34 @@ export default function DiagnosisPage({ onOpenChat }) {
             })}
           </div>
 
-          {/* AI Advice Button */}
-          <div className="flex gap-3">
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: '0.875rem' }}>
             <button
               onClick={handleAIAdvice}
-              className="flex-1 py-4 rounded-xl font-bold text-white transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
-              style={{ background: 'linear-gradient(135deg, #1a3a6b, #0ea5e9)' }}
+              style={{
+                flex: 1, padding: '1.125rem 1.5rem',
+                borderRadius: '0.75rem',
+                fontWeight: 700, fontSize: '1.0625rem', color: '#ffffff',
+                background: 'linear-gradient(135deg, #1a3a6b, #0ea5e9)',
+                border: 'none',
+                boxShadow: '0 4px 14px rgba(26,58,107,0.35)',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s',
+              }}
             >
               🤖 AI에게 맞춤 조언 받기
             </button>
             <button
               onClick={handleReset}
-              className="px-5 py-4 rounded-xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors"
+              style={{
+                padding: '1.125rem 1.5rem',
+                borderRadius: '0.75rem',
+                fontWeight: 600, fontSize: '0.9375rem',
+                color: '#475569',
+                backgroundColor: '#ffffff',
+                border: '2px solid #e2e8f0',
+                cursor: 'pointer',
+              }}
             >
               재진단
             </button>

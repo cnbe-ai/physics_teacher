@@ -32,10 +32,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8fafc' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8' }}>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-8 pb-24">
+      <main style={{
+        maxWidth: '900px',
+        margin: '0 auto',
+        padding: '2.5rem 1.25rem 7rem',
+      }}>
         {renderPage()}
       </main>
 

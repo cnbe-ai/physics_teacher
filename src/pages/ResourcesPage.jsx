@@ -1,53 +1,55 @@
-import { ExternalLink, BookOpen } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Card, CardBody } from '../components/ui/Card';
 import { theoreticalReferences, usefulLinks } from '../data/resourceData';
 
 export default function ResourcesPage() {
   return (
-    <div className="page-enter space-y-10">
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+
       {/* References */}
       <section>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Noto Serif KR, serif' }}>
-          📚 핵심 이론 문헌
-        </h2>
-        <p className="text-slate-500 mb-6">이 앱의 콘텐츠는 검증된 교육학 이론과 연구를 바탕으로 합니다.</p>
-
+        <h2 style={{ marginBottom: '0.5rem' }}>📚 핵심 이론 문헌</h2>
+        <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+          이 앱의 콘텐츠는 검증된 교육학 이론과 연구를 바탕으로 합니다.
+        </p>
         <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div style={{ overflowX: 'auto' }}>
+            <table>
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="text-left p-4 font-semibold text-slate-500 text-xs uppercase tracking-wide w-32">분류</th>
-                  <th className="text-left p-4 font-semibold text-slate-500 text-xs uppercase tracking-wide">저자 / 연도</th>
-                  <th className="text-left p-4 font-semibold text-slate-500 text-xs uppercase tracking-wide">자료</th>
-                  <th className="text-left p-4 font-semibold text-slate-500 text-xs uppercase tracking-wide hidden lg:table-cell">설명</th>
+                <tr>
+                  <th style={{ width: '8.5rem' }}>분류</th>
+                  <th style={{ width: '11rem' }}>저자 / 연도</th>
+                  <th>자료</th>
+                  <th style={{ width: '14rem' }}>설명</th>
                 </tr>
               </thead>
               <tbody>
                 {theoreticalReferences.map((ref, idx) => (
-                  <tr
-                    key={idx}
-                    className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${idx === theoreticalReferences.length - 1 ? 'border-0' : ''}`}
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{ref.icon}</span>
-                        <span
-                          className="text-xs font-semibold px-2 py-0.5 rounded-md whitespace-nowrap"
-                          style={{ backgroundColor: '#1a3a6b15', color: '#1a3a6b' }}
-                        >
+                  <tr key={idx}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '1.25rem' }}>{ref.icon}</span>
+                        <span style={{
+                          fontSize: '0.8125rem', fontWeight: 700,
+                          padding: '0.2rem 0.5rem', borderRadius: '0.375rem',
+                          whiteSpace: 'nowrap',
+                          backgroundColor: '#eef2ff', color: '#1a3a6b',
+                        }}>
                           {ref.category}
                         </span>
                       </div>
                     </td>
-                    <td className="p-4 text-slate-500 whitespace-nowrap">
-                      {ref.author} ({ref.year})
+                    <td style={{ color: '#64748b', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                      {ref.author}<br />
+                      <span style={{ color: '#94a3b8' }}>({ref.year})</span>
                     </td>
-                    <td className="p-4">
-                      <p className="font-medium text-slate-700 mb-1">{ref.title}</p>
-                      <p className="text-xs text-slate-400 italic">{ref.journal}</p>
+                    <td>
+                      <p style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem', fontSize: '0.9375rem' }}>
+                        {ref.title}
+                      </p>
+                      <p style={{ fontSize: '0.8125rem', color: '#94a3b8', fontStyle: 'italic' }}>{ref.journal}</p>
                     </td>
-                    <td className="p-4 text-slate-500 hidden lg:table-cell text-xs">{ref.description}</td>
+                    <td style={{ fontSize: '0.875rem', color: '#64748b' }}>{ref.description}</td>
                   </tr>
                 ))}
               </tbody>
@@ -56,38 +58,64 @@ export default function ResourcesPage() {
         </Card>
       </section>
 
-      {/* Useful Links */}
+      {/* Links */}
       <section>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Noto Serif KR, serif' }}>
-          🔗 유용한 링크
-        </h2>
-        <p className="text-slate-500 mb-6">물리교육 관련 필수 웹사이트를 북마크해두세요.</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 style={{ marginBottom: '0.5rem' }}>🔗 유용한 링크</h2>
+        <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: 1.75, marginBottom: '1.75rem' }}>
+          물리교육 관련 필수 웹사이트를 북마크해두세요.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
           {usefulLinks.map((link, idx) => (
             <a
               key={idx}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block rounded-xl border border-slate-200 bg-white p-5 hover:shadow-md transition-all duration-200 hover:-translate-y-1 group"
-              style={{ borderTopWidth: '3px', borderTopColor: link.color }}
+              style={{
+                display: 'block',
+                backgroundColor: '#ffffff',
+                borderRadius: '1rem',
+                border: `1.5px solid #e2e8f0`,
+                borderTop: `4px solid ${link.color}`,
+                padding: '1.375rem',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = `0 8px 20px ${link.color}25`;
+                e.currentTarget.style.borderColor = link.color + '60';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)';
+                e.currentTarget.style.borderColor = '#e2e8f0';
+              }}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: `${link.color}15` }}
-                >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.875rem' }}>
+                <div style={{
+                  width: '3rem', height: '3rem', borderRadius: '0.75rem', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1.5rem', backgroundColor: `${link.color}15`,
+                }}>
                   {link.icon}
                 </div>
-                <ExternalLink
-                  size={16}
-                  className="text-slate-300 group-hover:text-slate-500 transition-colors mt-1"
-                />
+                <ExternalLink size={15} style={{ color: '#cbd5e1', marginTop: '0.25rem' }} />
               </div>
-              <h3 className="font-bold text-slate-800 mb-1">{link.name}</h3>
-              <p className="text-sm text-slate-500">{link.description}</p>
-              <p className="text-xs mt-2 font-mono" style={{ color: link.color }}>
+              <h3 style={{
+                fontFamily: 'var(--font-serif)', fontSize: '1rem',
+                color: '#0f172a', marginBottom: '0.375rem',
+              }}>
+                {link.name}
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.65, marginBottom: '0.625rem' }}>
+                {link.description}
+              </p>
+              <p style={{
+                fontSize: '0.8125rem', fontFamily: 'var(--font-mono)',
+                color: link.color, opacity: 0.85,
+              }}>
                 {link.url.replace('https://', '')}
               </p>
             </a>
@@ -95,41 +123,42 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      {/* Citation Box */}
-      <section>
-        <Card topColor="#f59e0b">
-          <CardBody>
-            <div className="flex items-start gap-4">
-              <span className="text-2xl">📌</span>
-              <div>
-                <h3 className="font-bold text-slate-800 mb-3">이 자료를 인용할 때</h3>
-                <div className="rounded-lg bg-slate-50 p-4 font-mono text-xs text-slate-600 leading-relaxed">
-                  <p>물리교육학 교수팀. (2024). <em>물리교육과 신입생을 위한 전공 탐색 및 진로 설계 안내서</em>.</p>
-                  <p className="mt-1">※ 본 자료는 교육 목적으로 제작되었습니다.</p>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <span className="text-green-500">✓</span>
-                    수업 자료로 활용 가능
+      {/* Citation */}
+      <Card topColor="#f59e0b">
+        <CardBody>
+          <div style={{ display: 'flex', gap: '1.125rem', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '1.75rem', flexShrink: 0 }}>📌</span>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ marginBottom: '1rem', fontSize: '1.0625rem' }}>이 자료를 인용할 때</h3>
+              <div style={{
+                borderRadius: '0.625rem', backgroundColor: '#f8fafc',
+                padding: '1rem 1.125rem',
+                fontFamily: 'var(--font-mono)', fontSize: '0.875rem',
+                color: '#475569', lineHeight: 1.75,
+                border: '1px solid #e2e8f0',
+              }}>
+                <p>물리교육학 교수팀. (2024). <em>물리교육과 신입생을 위한 전공 탐색 및 진로 설계 안내서</em>.</p>
+                <p style={{ marginTop: '0.25rem', color: '#94a3b8' }}>※ 본 자료는 교육 목적으로 제작되었습니다.</p>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '1rem' }}>
+                {[
+                  { ok: true,  text: '수업 자료로 활용 가능' },
+                  { ok: true,  text: '학생 배포 가능' },
+                  { ok: false, text: '상업적 이용 불가' },
+                  { ok: false, text: '무단 수정 배포 불가' },
+                ].map((item) => (
+                  <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9375rem', color: '#475569' }}>
+                    <span style={{ color: item.ok ? '#10b981' : '#ef4444', fontWeight: 700, flexShrink: 0 }}>
+                      {item.ok ? '✓' : '✗'}
+                    </span>
+                    {item.text}
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <span className="text-green-500">✓</span>
-                    학생 배포 가능
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <span className="text-red-400">✗</span>
-                    상업적 이용 불가
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <span className="text-red-400">✗</span>
-                    무단 수정 배포 불가
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-          </CardBody>
-        </Card>
-      </section>
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }
