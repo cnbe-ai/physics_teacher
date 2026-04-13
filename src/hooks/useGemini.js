@@ -38,7 +38,7 @@ export function useGemini(apiKey) {
       contents[0].parts[0].text = `${SYSTEM_PROMPT}\n\n---\n\n${contents[0].parts[0].text}`;
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?key=${apiKey}&alt=sse`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:streamGenerateContent?key=${apiKey}&alt=sse`;
 
     try {
       const response = await fetch(url, {
